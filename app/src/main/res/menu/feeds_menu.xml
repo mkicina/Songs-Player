@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/playlist1"
+        android:title="Pop " />
+    <item
+        android:id="@+id/playlist2"
+        android:title="Rock " />
+    <item
+        android:id="@+id/playlist3"
+        android:title="Hip-hop" />
+    <item
+        android:id="@+id/playlist4"
+        android:title="Slovak" />
+    <item
+        android:id="@+id/playlist5"
+        android:title="Czech" />
+</menu>
