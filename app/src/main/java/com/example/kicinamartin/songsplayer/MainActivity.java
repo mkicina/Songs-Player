@@ -37,10 +37,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         listApps = findViewById(R.id.xmlListView);
         if (savedInstanceState != null){
-            feedXml = savedInstanceState.getString(STATE_XML); // v pripade ze sme mali otvoreny playlist a otocime obrazovku, povodne xml sa nam nacita
+            feedXml = savedInstanceState.getString(STATE_XML);
+            // v pripade ze sme mali otvoreny playlist a otocime obrazovku, povodne xml sa nam nacita
         }
         if (feedXml != null) {
-            downloadUrl(feedXml);
+            downloadPlaylist(feedXml);
         }
     }
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {  // vyber playlistu z menu
         int id = item.getItemId();
 
-        switch (id){
+        switch (id){    // rozne playlisty
             case R.id.playlist1:
                 feedXml =  "https://www.youtube.com/feeds/videos.xml?playlist_id=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj";
                 break;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 return super.onOptionsItemSelected(item);
         }
-        downloadUrl(feedXml);
+        downloadPlaylist(feedXml);
         return true;
 
     }
@@ -93,10 +94,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = YouTubeStandalonePlayer.createVideoIntent(this,GOOGLE_API_KEY,url,0,true,false);
         //vytvorenie "intentu" pomocou url videa a google key
 
-        startActivity(intent);  // spustenie aktivity
+        startActivity(intent);  // spustenie aktivity,videa
     }
 
-    private void downloadUrl(String feedUrl){
+    private void downloadPlaylist(String feedUrl){
             DownloadData downloadData = new DownloadData();
             downloadData.execute(feedUrl);
     }
@@ -111,6 +112,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
+        protected String doInBackground(String... strings) {    // funkcia, ktora sa vykona na pozadi aktivity
+            String rssFeed = downloadXML(strings[0]);
+            return rssFeed;
+        }
+
+        @Override
         public void onPostExecute(String s) {   // vykona sa po funkc. doInBackround, na hlavnej aktivite
             super.onPostExecute(s);
 
@@ -122,11 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             textView.setText(title);
         }
 
-        @Override
-        protected String doInBackground(String... strings) {    // funkcia, ktora sa vykona na pozadi aktivity
-            String rssFeed = downloadXML(strings[0]);
-            return rssFeed;
-        }
+
         private String downloadXML(String urlPath){
             StringBuilder xmlResult = new StringBuilder();
 
@@ -143,7 +146,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     }
                     if (charsRead > 0){
-                        xmlResult.append(String.copyValueOf(inputBuffer,0,charsRead));  //ak mame xml, nacita sa do premennej a funckia to vrati;
+                        xmlResult.append(String.copyValueOf(inputBuffer,0,charsRead));
+                        //ak mame xml, nacita sa do premennej a funckia to vrati;
                     }
                 }
                 reader.close();

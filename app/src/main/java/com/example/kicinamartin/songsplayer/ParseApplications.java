@@ -54,7 +54,6 @@ public class ParseApplications {
                         break;
                     case XmlPullParser.END_TAG:
                         if (inEntry){
-
                             if ("entry".equalsIgnoreCase(tagName)){
                                 applications.add(currentRecord);
                                 inEntry = false;
@@ -91,7 +90,6 @@ public class ParseApplications {
                     currentRecord.setTitle(tmpTitle);
                 }
             }
-
         }catch (Exception e){
             e.printStackTrace();
         }
