@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 public class ParseApplications {
 
-    private static final String TAG = "ParseApplications";
     private ArrayList<FeedEntry> applications;
 
     public ParseApplications() {
@@ -20,7 +19,6 @@ public class ParseApplications {
     }
 
     public void parse(String xmlData){
-        //boolean status = true;
         FeedEntry currentRecord = null;
         boolean inEntry = false;
         String textValue = "";
@@ -33,17 +31,17 @@ public class ParseApplications {
             XmlPullParser xpp = factory.newPullParser();
             xpp.setInput(new StringReader(xmlData));
             int eventType = xpp.getEventType();
-            while (eventType != XmlPullParser.END_DOCUMENT){
+            while (eventType != XmlPullParser.END_DOCUMENT){ // prechadzanie xml, kym nenarazi na koniec
                 String tagName = xpp.getName();
                 if (first){
-                    if ("title".equalsIgnoreCase(tagName)){
+                    if ("title".equalsIgnoreCase(tagName)){ // najdenie nazvu playlistu
                         XmlPullParser tmpXpp = xpp;
                         tmpTitle = tmpXpp.nextText();
                         first=false;
                     }
                 }
 
-                switch (eventType){
+                switch (eventType){ // vyplnenie info pre jednotlive pesnicky v playliste
                     case XmlPullParser.START_TAG:
                         if ("entry".equalsIgnoreCase(tagName)){
                             inEntry=true;
@@ -71,10 +69,10 @@ public class ParseApplications {
                                 year = date.substring(0,4);
                                 month = date.substring(5,7);
                                 day = date.substring(8,10);
-                                String newDate = day+'.'+month+'.'+year;
+                                String newDate = day+'.'+month+'.'+year;    // formatovanie datumu
                                 currentRecord.setReleaseDate("Release date: "+newDate);
                             }
-                            else if ("statistics".equals(tagName)){   //upravit formatovanie1
+                            else if ("statistics".equals(tagName)){
                                 currentRecord.setViews("views: " + xpp.getAttributeValue(null,"views"));
                             }
                             else if ("thumbnail".equals(tagName)){
@@ -95,9 +93,7 @@ public class ParseApplications {
             }
 
         }catch (Exception e){
-            //status = false;
             e.printStackTrace();
         }
-        //return status;
     }
 }

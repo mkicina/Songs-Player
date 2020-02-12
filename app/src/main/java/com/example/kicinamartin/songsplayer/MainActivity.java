@@ -24,11 +24,10 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "MainActivity";
     private ListView listApps;
-    private String feedXml = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj";
-    //private String feedCachedXml = "NOTHING";
+    private String feedXml = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj"; //xml default playlistu
     public static final String STATE_XML = "feedXml";
+    private static final String GOOGLE_API_KEY = "AIzaSyAW75oojoyAv-XeEJGDG6mg-0t909t9iak";
     public String title;
 
 
@@ -91,7 +90,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DownloadData downloadData = new DownloadData();
         FeedAdapter feedAdapter1 = downloadData.getFeedAdapter();
         String url = feedAdapter1.getViewHolder(v).name.getContentDescription().toString(); // ziskanie url videa na ktore sme klikli
-        Intent intent = YouTubeStandalonePlayer.createVideoIntent(this,YoutubeActivity.GOOGLE_API_KEY,url,0,true,false);
+        Intent intent = YouTubeStandalonePlayer.createVideoIntent(this,GOOGLE_API_KEY,url,0,true,false);
+        //vytvorenie "intentu" pomocou url videa a google key
+
         startActivity(intent);  // spustenie aktivity
     }
 
