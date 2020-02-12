@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = "MainActivity";
     private ListView listApps;
     private String feedXml = "https://www.youtube.com/feeds/videos.xml?playlist_id=PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj";
-    private String feedCachedXml = "NOTHING";
+    //private String feedCachedXml = "NOTHING";
     public static final String STATE_XML = "feedXml";
     public String title;
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         listApps = findViewById(R.id.xmlListView);
         if (savedInstanceState != null){
-            feedXml = savedInstanceState.getString(STATE_XML); // v pripade ze sme mali otvoreny playlist a otocime obrazovku, xml sa nam ulozi
+            feedXml = savedInstanceState.getString(STATE_XML); // v pripade ze sme mali otvoreny playlist a otocime obrazovku, povodne xml sa nam nacita
         }
         if (feedXml != null) {
             downloadUrl(feedXml);
@@ -47,12 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.feeds_menu,menu);
+        getMenuInflater().inflate(R.menu.feeds_menu,menu);  // vytvorenie menu s vyberom playlistov
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {  // vyber playlistu z menu
         int id = item.getItemId();
 
         switch (id){
@@ -90,57 +90,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         DownloadData downloadData = new DownloadData();
         FeedAdapter feedAdapter1 = downloadData.getFeedAdapter();
-        String url = feedAdapter1.getViewHolder(v).name.getContentDescription().toString();
+        String url = feedAdapter1.getViewHolder(v).name.getContentDescription().toString(); // ziskanie url videa na ktore sme klikli
         Intent intent = YouTubeStandalonePlayer.createVideoIntent(this,YoutubeActivity.GOOGLE_API_KEY,url,0,true,false);
-        startActivity(intent);
+        startActivity(intent);  // spustenie aktivity
     }
 
     private void downloadUrl(String feedUrl){
-        if (!feedUrl.equalsIgnoreCase(feedCachedXml)){
-            Log.d(TAG, "downloadUrl: Starting Async Task");
             DownloadData downloadData = new DownloadData();
             downloadData.execute(feedUrl);
-            feedCachedXml = feedUrl;
-            Log.d(TAG, "downloadUrl: Done");
-        }else{
-            Log.d(TAG, "downloadUrl: URL not changed");
-        }
     }
 
     public class DownloadData extends AsyncTask<String,Void,String> {
         private static final String TAG = "DownloadData";
         ParseApplications parseApplications = new ParseApplications();
         FeedAdapter feedAdapter = new FeedAdapter(MainActivity.this,R.layout.list_record,parseApplications.getApplications());
+
         FeedAdapter getFeedAdapter(){
                 return feedAdapter;
         }
+
         @Override
-        public void onPostExecute(String s) {
+        public void onPostExecute(String s) {   // vykona sa po funkc. doInBackround, na hlavnej aktivite
             super.onPostExecute(s);
-//            Log.d(TAG, "onPostExecute: parameter is: " + s);
-            //parseApplications = new ParseApplications();
+
             parseApplications.parse(s);
-
-
-            //feedAdapter = new FeedAdapter(MainActivity.this,R.layout.list_record,parseApplications.getApplications());
 
             listApps.setAdapter(feedAdapter);
             title=feedAdapter.getTitle();
             TextView textView = findViewById(R.id.title);
             textView.setText(title);
-
-            /*ArrayAdapter<FeedEntry> arrayAdapter = new ArrayAdapter<>(
-                    MainActivity.this,R.layout.list_item,parseApplications.getApplications());
-            listApps.setAdapter(arrayAdapter);*/
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            Log.d(TAG, "doInBackground: starts with: " + strings[0]);
+        protected String doInBackground(String... strings) {    // funkcia, ktora sa vykona na pozadi aktivity
             String rssFeed = downloadXML(strings[0]);
-            if (rssFeed == null){
-                Log.e(TAG, "doInBackground: Error downloading");
-            }
             return rssFeed;
         }
         private String downloadXML(String urlPath){
@@ -149,12 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try{
                 URL url  = new URL(urlPath);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                int response = connection.getResponseCode();
-                Log.d(TAG, "downloadXML: The response code was: " + response);
-                /*InputStream inputStream = connection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader reader = new BufferedReader(inputStreamReader);*/
-
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
                 int charsRead;
@@ -165,17 +142,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     }
                     if (charsRead > 0){
-                        xmlResult.append(String.copyValueOf(inputBuffer,0,charsRead));
+                        xmlResult.append(String.copyValueOf(inputBuffer,0,charsRead));  //ak mame xml, nacita sa do premennej a funckia to vrati;
                     }
                 }
                 reader.close();
                 return  xmlResult.toString();
-            }catch (MalformedURLException e){
+            }catch (MalformedURLException e){   //chybove hlasenia
                 Log.e(TAG, "downloadXML: Invalid URL " + e.getMessage());
             }catch (IOException e ){
-                Log.e(TAG, "downloadXML: IO Exception reading data" + e.getMessage());
+                Log.e(TAG, "downloadXML: IO Exception" + e.getMessage());
             }catch (SecurityException e){
-                Log.e(TAG, "downloadXML: Need permission? " + e.getMessage());
+                Log.e(TAG, "downloadXML: Security Exception " + e.getMessage());
             }
             return  null;
         }
